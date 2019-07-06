@@ -2,7 +2,7 @@
 set -e
 
 print_usage() {
-    cat << EOL 
+cat << EOL 
 Usage: ${0} [arguments] 
 
 Arguments: 
@@ -46,8 +46,15 @@ do
 done
 shift $(expr $OPTIND - 1) # remove options from positional parameters
 
-docker run -d --name teamcity-server \
+for DIR in ${data} ${logs}
+do
+	[ ! -d ${DIR} ] && mkdir -p ${DIR}
+done
+
+docker run -d --rm --name teamcity-server \
+-u $(id -u):$(id -g) \
 -v ${data}:/data/teamcity_server/datadir \
 -v ${logs}:/opt/teamcity/logs  \
 -p ${port}:8111 \
 jetbrains/teamcity-server
+
